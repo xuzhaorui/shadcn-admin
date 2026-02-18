@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shadcn.admin.backend.modules.system.departments.mapper.DepartmentMapper">
+
+  <resultMap id="DepartmentMap" type="com.shadcn.admin.backend.modules.system.departments.domain.DepartmentDO">
+    <id column="id" property="id"/>
+    <result column="parent_id" property="parentId"/>
+    <result column="name" property="name"/>
+    <result column="code" property="code"/>
+    <result column="sort" property="sort"/>
+    <result column="status" property="status"/>
+    <result column="version" property="version"/>
+  </resultMap>
+
+  <select id="selectAll" resultMap="DepartmentMap">
+    select id, parent_id, name, code, sort, status, version
+    from sys_department
+    order by sort asc, id asc
+  </select>
+
+  <select id="selectById" resultMap="DepartmentMap">
+    select id, parent_id, name, code, sort, status, version
+    from sys_department where id = #{id}
+  </select>
+
+  <insert id="insert">
+    insert into sys_department (id, parent_id, name, code, sort, status, version)
+    values (#{id}, #{parentId}, #{name}, #{code}, #{sort}, #{status}, #{version})
+  </insert>
+
+  <update id="update">
+    update sys_department
+    set parent_id = #{parentId}, name = #{name}, code = #{code}, sort = #{sort}, status = #{status}, version = version + 1
+    where id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    delete from sys_department where id = #{id}
+  </delete>
+
+  <update id="updateStatus">
+    update sys_department set status = #{status}, version = version + 1 where id = #{id}
+  </update>
+
+  <select id="existsByCode" resultType="int">
+    select count(1) from sys_department
+    where code = #{code}
+    <if test="excludeId != null and excludeId != ''">
+      and id != #{excludeId}
+    </if>
+  </select>
+
+  <select id="countChildren" resultType="int">
+    select count(1) from sys_department where parent_id = #{id}
+  </select>
+
+  <select id="countUsers" resultType="int">
+    select count(1) from sys_user where department_id = #{id}
+  </select>
+
+  <update id="updateSort">
+    update sys_department set sort = #{sort}, version = version + 1 where id = #{id}
+  </update>
+
+  <select id="countByParentAndIds" resultType="int">
+    select count(1) from sys_department
+    where parent_id = #{parentId}
+      and id in
+      <foreach collection="orderedIds" item="id" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+  </select>
+
+</mapper>
