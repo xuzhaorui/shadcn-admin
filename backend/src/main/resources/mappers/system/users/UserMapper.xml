@@ -44,6 +44,30 @@
           #{roleId}
         </foreach>
       </if>
+      <if test="dataScopeRestricted != null and dataScopeRestricted">
+        and
+        <choose>
+          <when test="(dataScopeAllowSelf != null and dataScopeAllowSelf) or (dataScopeDeptIds != null and dataScopeDeptIds.size() > 0)">
+            (
+            <if test="dataScopeAllowSelf != null and dataScopeAllowSelf">
+              u.id = #{dataScopeUserId}
+            </if>
+            <if test="dataScopeDeptIds != null and dataScopeDeptIds.size() > 0">
+              <if test="dataScopeAllowSelf != null and dataScopeAllowSelf">
+                or
+              </if>
+              u.department_id in
+              <foreach collection="dataScopeDeptIds" item="deptId" open="(" separator="," close=")">
+                #{deptId}
+              </foreach>
+            </if>
+            )
+          </when>
+          <otherwise>
+            1 = 0
+          </otherwise>
+        </choose>
+      </if>
     </where>
     order by u.id desc
     limit #{pageSize} offset #{offset}
@@ -73,6 +97,30 @@
           #{roleId}
         </foreach>
       </if>
+      <if test="dataScopeRestricted != null and dataScopeRestricted">
+        and
+        <choose>
+          <when test="(dataScopeAllowSelf != null and dataScopeAllowSelf) or (dataScopeDeptIds != null and dataScopeDeptIds.size() > 0)">
+            (
+            <if test="dataScopeAllowSelf != null and dataScopeAllowSelf">
+              u.id = #{dataScopeUserId}
+            </if>
+            <if test="dataScopeDeptIds != null and dataScopeDeptIds.size() > 0">
+              <if test="dataScopeAllowSelf != null and dataScopeAllowSelf">
+                or
+              </if>
+              u.department_id in
+              <foreach collection="dataScopeDeptIds" item="deptId" open="(" separator="," close=")">
+                #{deptId}
+              </foreach>
+            </if>
+            )
+          </when>
+          <otherwise>
+            1 = 0
+          </otherwise>
+        </choose>
+      </if>
     </where>
   </select>
 
@@ -86,11 +134,16 @@
     from sys_user u where u.username = #{username}
   </select>
 
-  <insert id="insert">
+  <select id="selectByEmail" resultMap="UserMap">
+    select u.id, u.username, u.real_name, u.email, u.phone, u.department_id, u.status, u.password_hash, u.version
+    from sys_user u where u.email = #{email}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
     insert into sys_user (
-      id, username, real_name, email, phone, department_id, status, password_hash, version
+      username, real_name, email, phone, department_id, status, password_hash, version
     ) values (
-      #{id}, #{username}, #{realName}, #{email}, #{phone}, #{departmentId}, #{status}, #{passwordHash}, #{version}
+      #{username}, #{realName}, #{email}, #{phone}, #{departmentId}, #{status}, #{passwordHash}, #{version}
     )
   </insert>
 
@@ -137,11 +190,59 @@
     select role_id from sys_user_role where user_id = #{userId}
   </select>
 
+  <select id="selectRoleBindingsByUserIds" resultType="map">
+    select user_id as userId, role_id as roleId
+    from sys_user_role
+    where user_id in
+    <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+      #{userId}
+    </foreach>
+  </select>
+
   <select id="selectRoleCodesByUserId" resultType="string">
     select r.code
     from sys_user_role ur
     join sys_role r on ur.role_id = r.id
     where ur.user_id = #{userId}
+  </select>
+
+  <select id="selectRoleNamesByUserId" resultType="string">
+    select r.name
+    from sys_user_role ur
+    join sys_role r on ur.role_id = r.id
+    where ur.user_id = #{userId}
+    order by r.name asc
+  </select>
+
+  <select id="selectMenuCodesByUserId" resultType="string">
+    select distinct m.code
+    from sys_user_role ur
+    join sys_role r on ur.role_id = r.id
+    join sys_role_menu rm on rm.role_id = r.id
+    join sys_menu m on m.id = rm.menu_id
+    where ur.user_id = #{userId}
+      and r.status in ('enabled', 'active')
+      and m.status in ('enabled', 'active')
+      and m.code is not null
+      and m.code != ''
+  </select>
+
+  <select id="selectRoleDataScopesByUserId" resultType="string">
+    select r.data_scope
+    from sys_user_role ur
+    join sys_role r on r.id = ur.role_id
+    where ur.user_id = #{userId}
+      and r.status in ('enabled', 'active')
+  </select>
+
+  <select id="selectCustomDeptIdsByUserId" resultType="string">
+    select distinct rd.dept_id
+    from sys_user_role ur
+    join sys_role r on r.id = ur.role_id
+    join sys_role_dept rd on rd.role_id = r.id
+    where ur.user_id = #{userId}
+      and r.status in ('enabled', 'active')
+      and r.data_scope = 'custom'
   </select>
 
   <select id="selectAllForPasswordMigration" resultType="com.shadcn.admin.backend.modules.system.users.domain.UserDO">
@@ -154,5 +255,97 @@
     set password_hash = #{passwordHash}, version = version + 1
     where id = #{id}
   </update>
+
+  <select id="selectAvailableForRole" resultType="com.shadcn.admin.backend.modules.system.users.dto.UserLiteDTO">
+    select
+      u.id,
+      u.username,
+      u.real_name as name,
+      u.phone,
+      u.email,
+      u.status
+    from sys_user u
+    where not exists (
+      select 1
+      from sys_user_role ur
+      where ur.user_id = u.id
+        and ur.role_id = #{query.roleId}
+    )
+    <if test="query.keyword != null and query.keyword != ''">
+      and (
+        u.username like concat('%', #{query.keyword}, '%')
+        or u.real_name like concat('%', #{query.keyword}, '%')
+        or u.phone like concat('%', #{query.keyword}, '%')
+      )
+    </if>
+    <if test="query.dataScopeRestricted != null and query.dataScopeRestricted">
+      and
+      <choose>
+        <when test="(query.dataScopeAllowSelf != null and query.dataScopeAllowSelf) or (query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0)">
+          (
+          <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+            u.id = #{query.dataScopeUserId}
+          </if>
+          <if test="query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0">
+            <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+              or
+            </if>
+            u.department_id in
+            <foreach collection="query.dataScopeDeptIds" item="deptId" open="(" separator="," close=")">
+              #{deptId}
+            </foreach>
+          </if>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+    </if>
+    order by u.id desc
+    limit #{query.pageSize} offset #{query.offset}
+  </select>
+
+  <select id="countAvailableForRole" resultType="long">
+    select count(1)
+    from sys_user u
+    where not exists (
+      select 1
+      from sys_user_role ur
+      where ur.user_id = u.id
+        and ur.role_id = #{query.roleId}
+    )
+    <if test="query.keyword != null and query.keyword != ''">
+      and (
+        u.username like concat('%', #{query.keyword}, '%')
+        or u.real_name like concat('%', #{query.keyword}, '%')
+        or u.phone like concat('%', #{query.keyword}, '%')
+      )
+    </if>
+    <if test="query.dataScopeRestricted != null and query.dataScopeRestricted">
+      and
+      <choose>
+        <when test="(query.dataScopeAllowSelf != null and query.dataScopeAllowSelf) or (query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0)">
+          (
+          <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+            u.id = #{query.dataScopeUserId}
+          </if>
+          <if test="query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0">
+            <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+              or
+            </if>
+            u.department_id in
+            <foreach collection="query.dataScopeDeptIds" item="deptId" open="(" separator="," close=")">
+              #{deptId}
+            </foreach>
+          </if>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+    </if>
+  </select>
 
 </mapper>

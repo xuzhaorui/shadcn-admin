@@ -43,9 +43,13 @@
     select id, code, name, status, data_scope, version from sys_role where id = #{id}
   </select>
 
-  <insert id="insert">
-    insert into sys_role (id, code, name, status, data_scope, version)
-    values (#{id}, #{code}, #{name}, #{status}, #{dataScope}, #{version})
+  <select id="selectByCode" resultMap="RoleMap">
+    select id, code, name, status, data_scope, version from sys_role where code = #{code}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    insert into sys_role (code, name, status, data_scope, version)
+    values (#{code}, #{name}, #{status}, #{dataScope}, #{version})
   </insert>
 
   <update id="update">
@@ -82,6 +86,15 @@
     select menu_id from sys_role_menu where role_id = #{roleId}
   </select>
 
+  <select id="selectMenuBindingsByRoleIds" resultType="map">
+    select role_id as roleId, menu_id as menuId
+    from sys_role_menu
+    where role_id in
+    <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
+      #{roleId}
+    </foreach>
+  </select>
+
   <delete id="deleteRoleDepts">
     delete from sys_role_dept where role_id = #{roleId}
   </delete>
@@ -92,6 +105,90 @@
 
   <select id="selectUserIds" resultType="string">
     select user_id from sys_user_role where role_id = #{roleId}
+  </select>
+
+  <select id="selectUsersByRoleId" resultType="com.shadcn.admin.backend.modules.system.users.dto.UserLiteDTO">
+    select
+      u.id,
+      u.username,
+      u.real_name as name,
+      u.phone,
+      u.email,
+      u.status
+    from sys_user u
+    join sys_user_role ur on ur.user_id = u.id
+    where ur.role_id = #{roleId}
+    <if test="query.keyword != null and query.keyword != ''">
+      and (
+        u.username like concat('%', #{query.keyword}, '%')
+        or u.real_name like concat('%', #{query.keyword}, '%')
+        or u.phone like concat('%', #{query.keyword}, '%')
+      )
+    </if>
+    <if test="query.dataScopeRestricted != null and query.dataScopeRestricted">
+      and
+      <choose>
+        <when test="(query.dataScopeAllowSelf != null and query.dataScopeAllowSelf) or (query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0)">
+          (
+          <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+            u.id = #{query.dataScopeUserId}
+          </if>
+          <if test="query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0">
+            <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+              or
+            </if>
+            u.department_id in
+            <foreach collection="query.dataScopeDeptIds" item="deptId" open="(" separator="," close=")">
+              #{deptId}
+            </foreach>
+          </if>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+    </if>
+    order by u.id desc
+    limit #{query.pageSize} offset #{query.offset}
+  </select>
+
+  <select id="countUsersByRoleIdWithKeyword" resultType="long">
+    select count(1)
+    from sys_user u
+    join sys_user_role ur on ur.user_id = u.id
+    where ur.role_id = #{roleId}
+    <if test="query.keyword != null and query.keyword != ''">
+      and (
+        u.username like concat('%', #{query.keyword}, '%')
+        or u.real_name like concat('%', #{query.keyword}, '%')
+        or u.phone like concat('%', #{query.keyword}, '%')
+      )
+    </if>
+    <if test="query.dataScopeRestricted != null and query.dataScopeRestricted">
+      and
+      <choose>
+        <when test="(query.dataScopeAllowSelf != null and query.dataScopeAllowSelf) or (query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0)">
+          (
+          <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+            u.id = #{query.dataScopeUserId}
+          </if>
+          <if test="query.dataScopeDeptIds != null and query.dataScopeDeptIds.size() > 0">
+            <if test="query.dataScopeAllowSelf != null and query.dataScopeAllowSelf">
+              or
+            </if>
+            u.department_id in
+            <foreach collection="query.dataScopeDeptIds" item="deptId" open="(" separator="," close=")">
+              #{deptId}
+            </foreach>
+          </if>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+    </if>
   </select>
 
   <insert id="insertUserRole">

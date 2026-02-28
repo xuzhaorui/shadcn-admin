@@ -9,6 +9,10 @@ public class UserListQuery {
     private String status;
     private String departmentId;
     private List<String> roleIds;
+    private Boolean dataScopeRestricted = false;
+    private Boolean dataScopeAllowSelf = false;
+    private String dataScopeUserId;
+    private List<String> dataScopeDeptIds;
 
     public int getPage() {
         return page;
@@ -56,6 +60,38 @@ public class UserListQuery {
 
     public void setRoleIds(List<String> roleIds) {
         this.roleIds = roleIds;
+    }
+
+    public Boolean getDataScopeRestricted() {
+        return dataScopeRestricted;
+    }
+
+    public void setDataScopeRestricted(Boolean dataScopeRestricted) {
+        this.dataScopeRestricted = dataScopeRestricted;
+    }
+
+    public Boolean getDataScopeAllowSelf() {
+        return dataScopeAllowSelf;
+    }
+
+    public void setDataScopeAllowSelf(Boolean dataScopeAllowSelf) {
+        this.dataScopeAllowSelf = dataScopeAllowSelf;
+    }
+
+    public String getDataScopeUserId() {
+        return dataScopeUserId;
+    }
+
+    public void setDataScopeUserId(String dataScopeUserId) {
+        this.dataScopeUserId = dataScopeUserId;
+    }
+
+    public List<String> getDataScopeDeptIds() {
+        return dataScopeDeptIds;
+    }
+
+    public void setDataScopeDeptIds(List<String> dataScopeDeptIds) {
+        this.dataScopeDeptIds = dataScopeDeptIds;
     }
 
     public int getOffset() {

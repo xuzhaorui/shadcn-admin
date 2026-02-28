@@ -2,11 +2,16 @@ package com.shadcn.admin.backend.modules.system.users.controller;
 
 import com.shadcn.admin.backend.common.api.ApiResponse;
 import com.shadcn.admin.backend.common.api.PageResponse;
+import com.shadcn.admin.backend.common.auth.AuthUser;
+import com.shadcn.admin.backend.infra.web.JwtAuthWebFilter;
 import com.shadcn.admin.backend.modules.system.users.dto.BatchDeleteRequest;
 import com.shadcn.admin.backend.modules.system.users.dto.ResetPasswordRequest;
+import com.shadcn.admin.backend.modules.system.users.dto.RoleAvailableUserQuery;
 import com.shadcn.admin.backend.modules.system.users.dto.ToggleStatusRequest;
 import com.shadcn.admin.backend.modules.system.users.dto.UserDTO;
 import com.shadcn.admin.backend.modules.system.users.dto.UserListQuery;
+import com.shadcn.admin.backend.modules.system.users.dto.UserLiteDTO;
+import com.shadcn.admin.backend.modules.system.users.dto.UserRoleAssignRequest;
 import com.shadcn.admin.backend.modules.system.users.dto.UserUpsertRequest;
 import com.shadcn.admin.backend.modules.system.users.service.UserService;
 import jakarta.validation.Valid;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Validated
@@ -34,8 +40,16 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public Mono<ApiResponse<PageResponse<UserDTO>>> list(UserListQuery query) {
-        return userService.list(query).map(ApiResponse::success);
+    public Mono<ApiResponse<PageResponse<UserDTO>>> list(UserListQuery query, ServerWebExchange exchange) {
+        AuthUser authUser = exchange.getAttribute(JwtAuthWebFilter.AUTH_USER_ATTR);
+        return userService.list(query, authUser == null ? null : authUser.userId()).map(ApiResponse::success);
+    }
+
+    @GetMapping("/available-for-role")
+    public Mono<ApiResponse<PageResponse<UserLiteDTO>>> availableForRole(
+            RoleAvailableUserQuery query, ServerWebExchange exchange) {
+        AuthUser authUser = exchange.getAttribute(JwtAuthWebFilter.AUTH_USER_ATTR);
+        return userService.availableForRole(query, authUser == null ? null : authUser.userId()).map(ApiResponse::success);
     }
 
     @GetMapping("/{id}")
@@ -73,8 +87,13 @@ public class UserController {
         return userService.resetPassword(id, req).thenReturn(ApiResponse.success());
     }
 
+    @PostMapping("/{id}/roles")
+    public Mono<ApiResponse<Void>> assignRoles(@PathVariable String id, @Valid @RequestBody UserRoleAssignRequest req) {
+        return userService.assignRoles(id, req).thenReturn(ApiResponse.success());
+    }
+
     @GetMapping("/export")
     public Mono<ApiResponse<String>> export() {
-        return Mono.just(ApiResponse.success("TODO: export users"));
+        return Mono.just(ApiResponse.fail(501, "export users not implemented"));
     }
 }

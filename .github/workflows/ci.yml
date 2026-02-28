@@ -39,3 +39,21 @@ jobs:
 
       - name: Build the project
         run: pnpm build
+
+  backend-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Backend test
+        run: mvn -B test
+        working-directory: backend

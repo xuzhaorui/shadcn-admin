@@ -1,11 +1,13 @@
 package com.shadcn.admin.backend.modules.system.roles.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public class SaveRoleDataScopeRequest {
     @NotBlank
     private String dataScope;
+    @JsonAlias({"customDeptIds"})
     private List<String> deptIds;
 
     public String getDataScope() { return dataScope; }

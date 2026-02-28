@@ -1,8 +1,13 @@
 import React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
+import { buildNavGroupsFromMenus } from '@/components/layout/data/dynamic-system-nav'
 import { useSearch } from '@/context/search-provider'
 import { useTheme } from '@/context/theme-provider'
+import { menuApi } from '@/features/system/menus/api/menu-api'
+import { getPermissionsFromUser } from '@/lib/permission'
+import { useAuthStore } from '@/stores/auth-store'
 import {
   CommandDialog,
   CommandEmpty,
@@ -12,13 +17,25 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command'
-import { sidebarData } from './layout/data/sidebar-data'
 import { ScrollArea } from './ui/scroll-area'
 
 export function CommandMenu() {
   const navigate = useNavigate()
   const { setTheme } = useTheme()
   const { open, setOpen } = useSearch()
+  const authUser = useAuthStore((state) => state.auth.user)
+  const permissions = React.useMemo(() => getPermissionsFromUser(authUser), [authUser])
+
+  const { data: menuTree } = useQuery({
+    queryKey: ['menus'],
+    queryFn: () => menuApi.getMenuList(),
+    staleTime: 1000 * 60 * 5,
+  })
+
+  const navGroups = React.useMemo(() => {
+    if (!menuTree?.length) return []
+    return buildNavGroupsFromMenus(menuTree, permissions)
+  }, [menuTree, permissions])
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {
@@ -30,14 +47,14 @@ export function CommandMenu() {
 
   return (
     <CommandDialog modal open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder='Type a command or search...' />
+      <CommandInput placeholder='输入菜单名称进行搜索...' />
       <CommandList>
         <ScrollArea type='hover' className='h-72 pe-1'>
-          <CommandEmpty>No results found.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
+          <CommandEmpty>未找到匹配菜单。</CommandEmpty>
+          {navGroups.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>
               {group.items.map((navItem, i) => {
-                if (navItem.url)
+                if (navItem.url) {
                   return (
                     <CommandItem
                       key={`${navItem.url}-${i}`}
@@ -52,11 +69,12 @@ export function CommandMenu() {
                       {navItem.title}
                     </CommandItem>
                   )
+                }
 
-                return navItem.items?.map((subItem, i) => (
+                return navItem.items?.map((subItem, subIndex) => (
                   <CommandItem
-                    key={`${navItem.title}-${subItem.url}-${i}`}
-                    value={`${navItem.title}-${subItem.url}`}
+                    key={`${navItem.title}-${subItem.url}-${subIndex}`}
+                    value={`${navItem.title} ${subItem.title}`}
                     onSelect={() => {
                       runCommand(() => navigate({ to: subItem.url }))
                     }}
@@ -71,17 +89,17 @@ export function CommandMenu() {
             </CommandGroup>
           ))}
           <CommandSeparator />
-          <CommandGroup heading='Theme'>
+          <CommandGroup heading='主题'>
             <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
-              <Sun /> <span>Light</span>
+              <Sun /> <span>浅色</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
               <Moon className='scale-90' />
-              <span>Dark</span>
+              <span>深色</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
               <Laptop />
-              <span>System</span>
+              <span>跟随系统</span>
             </CommandItem>
           </CommandGroup>
         </ScrollArea>

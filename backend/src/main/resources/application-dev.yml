@@ -1,0 +1,6 @@
+app:
+  auth:
+    allow-register: true
+    cookie-secure: false
+  seed:
+    enabled: false

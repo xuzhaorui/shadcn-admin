@@ -1,6 +1,6 @@
 import { UsersActionDialog } from './users-action-dialog'
 import { UsersDeleteDialog } from './users-delete-dialog'
-import { UsersInviteDialog } from './users-invite-dialog'
+import { ResetPasswordDialog } from './reset-password-dialog'
 import { useUsers } from './users-provider'
 
 export function UsersDialogs() {
@@ -11,12 +11,6 @@ export function UsersDialogs() {
         key='user-add'
         open={open === 'add'}
         onOpenChange={() => setOpen('add')}
-      />
-
-      <UsersInviteDialog
-        key='user-invite'
-        open={open === 'invite'}
-        onOpenChange={() => setOpen('invite')}
       />
 
       {currentRow && (
@@ -43,6 +37,19 @@ export function UsersDialogs() {
               }, 500)
             }}
             currentRow={currentRow}
+          />
+
+          <ResetPasswordDialog
+            key={`user-reset-password-${currentRow.id}`}
+            userId={currentRow.id}
+            username={currentRow.username}
+            open={open === 'resetPassword'}
+            onOpenChange={() => {
+              setOpen('resetPassword')
+              setTimeout(() => {
+                setCurrentRow(null)
+              }, 500)
+            }}
           />
         </>
       )}

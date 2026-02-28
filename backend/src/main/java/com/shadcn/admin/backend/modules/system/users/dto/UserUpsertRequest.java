@@ -2,7 +2,6 @@ package com.shadcn.admin.backend.modules.system.users.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import java.util.List;
 
 public class UserUpsertRequest {
     @NotBlank
@@ -19,8 +18,6 @@ public class UserUpsertRequest {
 
     @NotBlank
     private String departmentId;
-
-    private List<String> roleIds;
 
     @NotBlank
     private String status;
@@ -65,14 +62,6 @@ public class UserUpsertRequest {
 
     public void setDepartmentId(String departmentId) {
         this.departmentId = departmentId;
-    }
-
-    public List<String> getRoleIds() {
-        return roleIds;
-    }
-
-    public void setRoleIds(List<String> roleIds) {
-        this.roleIds = roleIds;
     }
 
     public String getStatus() {

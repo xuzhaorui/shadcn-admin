@@ -1,0 +1,35 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+app:
+  auth:
+    jwt-secret: ${APP_AUTH_JWT_SECRET}
+    token-expire-seconds: ${APP_AUTH_TOKEN_EXPIRE_SECONDS:3600}
+    refresh-token-expire-seconds: ${APP_AUTH_REFRESH_TOKEN_EXPIRE_SECONDS:604800}
+    access-cookie-name: ${APP_AUTH_ACCESS_COOKIE_NAME:access_token}
+    refresh-cookie-name: ${APP_AUTH_REFRESH_COOKIE_NAME:refresh_token}
+    cookie-secure: true
+    allow-register: false
+  backup:
+    output-dir: ${APP_BACKUP_OUTPUT_DIR:/data/backups/sql}
+    mysqldump-executable: ${MYSQLDUMP_EXECUTABLE:mysqldump}
+  seed:
+    enabled: false

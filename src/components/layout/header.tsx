@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { Children, useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { RouteTabs } from '@/components/layout/route-tabs'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -10,6 +11,9 @@ type HeaderProps = React.HTMLAttributes<HTMLElement> & {
 
 export function Header({ className, fixed, children, ...props }: HeaderProps) {
   const [offset, setOffset] = useState(0)
+  const childArray = useMemo(() => Children.toArray(children), [children])
+  const firstChild = childArray[0] ?? null
+  const restChildren = childArray.slice(1)
 
   useEffect(() => {
     const onScroll = () => {
@@ -43,7 +47,9 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
       >
         <SidebarTrigger variant='outline' className='max-md:scale-125' />
         <Separator orientation='vertical' className='h-6' />
-        {children}
+        {firstChild}
+        <RouteTabs inline />
+        {restChildren}
       </div>
     </header>
   )

@@ -1,0 +1,208 @@
+{
+    "metrics": {
+        "checks": {
+            "passes": 199668,
+            "fails": 86,
+            "value": 0.9995694704486519
+        },
+        "http_req_blocked": {
+            "max": 121.4202,
+            "avg": 0.30229830491504467,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0.5167920000000041
+        },
+        "http_req_duration": {
+            "min": 0,
+            "med": 1.5842,
+            "p(90)": 3.494000000000004,
+            "p(95)": 3.9933,
+            "p(99)": 11.202648000000263,
+            "max": 235.2836,
+            "avg": 2.7736678314326486,
+            "thresholds": {
+                "p(95)<1200": false,
+                "p(99)<2500": false
+            }
+        },
+        "http_req_tls_handshaking": {
+            "max": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0
+        },
+        "data_received": {
+            "count": 141750120,
+            "rate": 2324408.908849181
+        },
+        "http_req_failed": {
+            "passes": 43,
+            "fails": 99834,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0.00043052955134815823
+        },
+        "http_req_receiving": {
+            "p(95)": 0.5344,
+            "p(99)": 0.7509440000000032,
+            "max": 72.1264,
+            "avg": 0.08265685793526044,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0.44480000000000436
+        },
+        "http_req_waiting": {
+            "avg": 2.450353362636047,
+            "min": 0,
+            "med": 1.5576,
+            "p(90)": 3.3785,
+            "p(95)": 3.8915,
+            "p(99)": 10.523,
+            "max": 205.9013
+        },
+        "data_sent": {
+            "count": 37489652,
+            "rate": 614752.7853835716
+        },
+        "http_reqs": {
+            "count": 99877,
+            "rate": 1637.7763108005106
+        },
+        "iteration_duration": {
+            "avg": 603.5835481942819,
+            "min": 200.7589,
+            "med": 603.4897,
+            "p(90)": 923.10522,
+            "p(95)": 963.25174,
+            "p(99)": 995.248468,
+            "max": 1234.3927
+        },
+        "iterations": {
+            "count": 99877,
+            "rate": 1637.7763108005106
+        },
+        "http_req_sending": {
+            "avg": 0.24065761086135912,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 125.9236
+        },
+        "http_req_duration{expected_response:true}": {
+            "p(90)": 3.49477,
+            "p(95)": 3.9937749999999954,
+            "p(99)": 11.224233999999912,
+            "max": 235.2836,
+            "avg": 2.7748624917362688,
+            "min": 0,
+            "med": 1.5847
+        },
+        "vus": {
+            "value": 3,
+            "min": 3,
+            "max": 1000
+        },
+        "vus_max": {
+            "max": 1000,
+            "value": 1000,
+            "min": 1000
+        },
+        "login_fail_rate": {
+            "fails": 0,
+            "passes": 0,
+            "thresholds": {
+                "rate==0": false
+            },
+            "value": 0
+        },
+        "app_error_rate": {
+            "passes": 43,
+            "fails": 99834,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0.00043052955134815823
+        },
+        "http_req_connecting": {
+            "max": 114.3803,
+            "avg": 0.28473028324839494,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0
+        }
+    },
+    "root_group": {
+        "groups": {},
+        "checks": {
+                "auth_me http 200": {
+                    "passes": 54887,
+                    "fails": 23,
+                    "name": "auth_me http 200",
+                    "path": "::auth_me http 200",
+                    "id": "ed6e3c84749bbf16b04b759af62f3783"
+                },
+                "auth_me app code 200": {
+                    "name": "auth_me app code 200",
+                    "path": "::auth_me app code 200",
+                    "id": "b6198990e400fe94108c455279f82c5a",
+                    "passes": 54887,
+                    "fails": 23
+                },
+                "users_list http 200": {
+                    "name": "users_list http 200",
+                    "path": "::users_list http 200",
+                    "id": "11c13ae8f45d5603fc01378bb74590c1",
+                    "passes": 24724,
+                    "fails": 6
+                },
+                "users_list app code 200": {
+                    "fails": 6,
+                    "name": "users_list app code 200",
+                    "path": "::users_list app code 200",
+                    "id": "35097d23f0094ca9be0210861d898de5",
+                    "passes": 24724
+                },
+                "menus_tree http 200": {
+                    "name": "menus_tree http 200",
+                    "path": "::menus_tree http 200",
+                    "id": "de80502fcca13722c7d7249d165c2232",
+                    "passes": 8073,
+                    "fails": 9
+                },
+                "menus_tree app code 200": {
+                    "name": "menus_tree app code 200",
+                    "path": "::menus_tree app code 200",
+                    "id": "db74489e4c9b7c27bca294fab0b85ad3",
+                    "passes": 8073,
+                    "fails": 9
+                },
+                "roles_list http 200": {
+                    "name": "roles_list http 200",
+                    "path": "::roles_list http 200",
+                    "id": "366f4a91adab7fcf68abaac3a54f5d55",
+                    "passes": 12150,
+                    "fails": 5
+                },
+                "roles_list app code 200": {
+                    "id": "561629dbfb429962ea2f40a5dc636769",
+                    "passes": 12150,
+                    "fails": 5,
+                    "name": "roles_list app code 200",
+                    "path": "::roles_list app code 200"
+                }
+            },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+}

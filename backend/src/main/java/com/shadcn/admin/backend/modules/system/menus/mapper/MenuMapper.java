@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 public interface MenuMapper {
     List<MenuDO> selectAll();
     MenuDO selectById(@Param("id") String id);
+    MenuDO selectByCode(@Param("code") String code);
     int insert(MenuDO menu);
     int update(MenuDO menu);
     int deleteById(@Param("id") String id);

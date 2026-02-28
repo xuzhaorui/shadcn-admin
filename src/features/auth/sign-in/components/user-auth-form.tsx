@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,7 +7,8 @@ import { Loader2, LogIn } from 'lucide-react'
 import { toast } from 'sonner'
 import { IconFacebook, IconGithub } from '@/assets/brand-icons'
 import { useAuthStore } from '@/stores/auth-store'
-import { sleep, cn } from '@/lib/utils'
+import { http } from '@/lib/http-client'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -21,24 +22,25 @@ import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
-  password: z
-    .string()
-    .min(1, 'Please enter your password')
-    .min(7, 'Password must be at least 7 characters long'),
+  account: z.string().min(1, '请输入账号或邮箱'),
+  password: z.string().min(1, '请输入密码').min(7, '密码至少7位'),
 })
+
+interface LoginResponse {
+  accessToken: string
+  tokenType: string
+  expiresIn: number
+  userId: string
+  username: string
+  permissions?: string[]
+  roleNames?: string[]
+}
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string
 }
 
-export function UserAuthForm({
-  className,
-  redirectTo,
-  ...props
-}: UserAuthFormProps) {
+export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const { auth } = useAuthStore()
@@ -46,56 +48,61 @@ export function UserAuthForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      account: '',
       password: '',
     },
   })
 
+  const resolveLoginTarget = (candidate: string | undefined, permissions: string[] | undefined) => {
+    void permissions
+    if (!candidate) return '/'
+    return candidate.startsWith('/') ? candidate : '/'
+  }
+
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
 
-    toast.promise(sleep(2000), {
-      loading: 'Signing in...',
-      success: () => {
-        setIsLoading(false)
+    const runLogin = async () => {
+      const result = await http.post<LoginResponse>('/auth/login', {
+        username: data.account,
+        password: data.password,
+      })
 
-        // Mock successful authentication with expiry computed at success time
-        const mockUser = {
-          accountNo: 'ACC001',
-          email: data.email,
-          role: ['user'],
-          exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
-        }
+      auth.setUser({
+        accountNo: result.userId,
+        email: result.username,
+        role: result.roleNames ?? [],
+        permissions: result.permissions ?? [],
+        exp: Date.now() + result.expiresIn * 1000,
+      })
+      return { message: `欢迎回来，${result.username}`, permissions: result.permissions ?? [] }
+    }
 
-        // Set user and access token
-        auth.setUser(mockUser)
-        auth.setAccessToken('mock-access-token')
+    const loginPromise = runLogin()
 
-        // Redirect to the stored location or default to dashboard
-        const targetPath = redirectTo || '/'
+    toast.promise(loginPromise, {
+      loading: '登录中... ',
+      success: ({ message, permissions }) => {
+        const targetPath = resolveLoginTarget(redirectTo, permissions)
         navigate({ to: targetPath, replace: true })
-
-        return `Welcome back, ${data.email}!`
+        return message
       },
-      error: 'Error',
+      error: (error) => (error instanceof Error ? error.message : '登录失败'),
     })
+    loginPromise.finally(() => setIsLoading(false))
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-3', className)}
-        {...props}
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn('grid gap-3', className)} {...props}>
         <FormField
           control={form.control}
-          name='email'
+          name='account'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>邮箱/账号</FormLabel>
               <FormControl>
-                <Input placeholder='name@example.com' {...field} />
+                <Input placeholder='请输入邮箱或账号' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -106,7 +113,7 @@ export function UserAuthForm({
           name='password'
           render={({ field }) => (
             <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>密码</FormLabel>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
@@ -115,14 +122,14 @@ export function UserAuthForm({
                 to='/forgot-password'
                 className='absolute end-0 -top-0.5 text-sm font-medium text-muted-foreground hover:opacity-75'
               >
-                Forgot password?
+                忘记密码？
               </Link>
             </FormItem>
           )}
         />
         <Button className='mt-2' disabled={isLoading}>
           {isLoading ? <Loader2 className='animate-spin' /> : <LogIn />}
-          Sign in
+          登录
         </Button>
 
         <div className='relative my-2'>
@@ -130,9 +137,7 @@ export function UserAuthForm({
             <span className='w-full border-t' />
           </div>
           <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>
-              Or continue with
-            </span>
+            <span className='bg-background px-2 text-muted-foreground'>或使用以下方式登录</span>
           </div>
         </div>
 

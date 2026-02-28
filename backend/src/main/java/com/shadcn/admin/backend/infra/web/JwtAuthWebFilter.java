@@ -1,9 +1,11 @@
 package com.shadcn.admin.backend.infra.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shadcn.admin.backend.common.auth.AuthProperties;
 import com.shadcn.admin.backend.common.api.ApiResponse;
 import com.shadcn.admin.backend.common.auth.AuthUser;
 import com.shadcn.admin.backend.common.auth.JwtTokenService;
+import com.shadcn.admin.backend.modules.monitor.online.service.OnlineSessionRegistry;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.springframework.core.Ordered;
@@ -22,15 +24,25 @@ import reactor.core.publisher.Mono;
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 public class JwtAuthWebFilter implements WebFilter {
     public static final String AUTH_USER_ATTR = "authUser";
-    private static final Set<String> OPEN_PATHS = Set.of("/api/auth/login", "/actuator/health", "/actuator/info");
+    private static final Set<String> OPEN_PATHS =
+            Set.of("/api/auth/login", "/api/auth/refresh", "/api/auth/register", "/actuator/health", "/actuator/info");
     private static final String AUTH_PREFIX = "Bearer ";
+    private static final String DENY_ALL_PERMISSION = "__deny__";
 
     private final JwtTokenService jwtTokenService;
     private final ObjectMapper objectMapper;
+    private final OnlineSessionRegistry onlineSessionRegistry;
+    private final AuthProperties authProperties;
 
-    public JwtAuthWebFilter(JwtTokenService jwtTokenService, ObjectMapper objectMapper) {
+    public JwtAuthWebFilter(
+            JwtTokenService jwtTokenService,
+            ObjectMapper objectMapper,
+            OnlineSessionRegistry onlineSessionRegistry,
+            AuthProperties authProperties) {
         this.jwtTokenService = jwtTokenService;
         this.objectMapper = objectMapper;
+        this.onlineSessionRegistry = onlineSessionRegistry;
+        this.authProperties = authProperties;
     }
 
     @Override
@@ -41,24 +53,31 @@ public class JwtAuthWebFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith(AUTH_PREFIX)) {
+        String token = resolveAccessToken(exchange);
+        if (token == null || token.isBlank()) {
             return writeError(exchange, HttpStatus.UNAUTHORIZED, "unauthorized");
+        }
+
+        if (onlineSessionRegistry.isTokenBlocked(token)) {
+            return writeError(exchange, HttpStatus.UNAUTHORIZED, "token revoked");
         }
 
         AuthUser authUser;
         try {
-            authUser = jwtTokenService.parse(authHeader.substring(AUTH_PREFIX.length()));
+            authUser = jwtTokenService.parseAccessToken(token);
         } catch (Exception ex) {
             return writeError(exchange, HttpStatus.UNAUTHORIZED, "invalid token");
         }
 
         String requiredPermission = PermissionResolver.resolve(method, path);
+        if (DENY_ALL_PERMISSION.equals(requiredPermission)) {
+            return writeError(exchange, HttpStatus.FORBIDDEN, "forbidden");
+        }
         if (requiredPermission != null && !hasPermission(authUser, requiredPermission)) {
             return writeError(exchange, HttpStatus.FORBIDDEN, "forbidden");
         }
-
         exchange.getAttributes().put(AUTH_USER_ATTR, authUser);
+        onlineSessionRegistry.touchByToken(token);
         return chain.filter(exchange);
     }
 
@@ -67,6 +86,15 @@ public class JwtAuthWebFilter implements WebFilter {
             return false;
         }
         return authUser.permissions().contains("*") || authUser.permissions().contains(permission);
+    }
+
+    private String resolveAccessToken(ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith(AUTH_PREFIX)) {
+            return authHeader.substring(AUTH_PREFIX.length());
+        }
+        var cookie = exchange.getRequest().getCookies().getFirst(authProperties.getAccessCookieName());
+        return cookie == null ? null : cookie.getValue();
     }
 
     private Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
@@ -99,7 +127,25 @@ public class JwtAuthWebFilter implements WebFilter {
             if (path.startsWith("/api/system/departments")) {
                 return resolveDepartments(method);
             }
-            return null;
+            if (path.startsWith("/api/system/logs")) {
+                return resolveLogs(method);
+            }
+            if (path.startsWith("/api/monitor/online")) {
+                return resolveMonitorOnline(method, path);
+            }
+            if (path.startsWith("/api/monitor/jobs")) {
+                return resolveMonitorJobs(method, path);
+            }
+            if (path.startsWith("/api/monitor/cache")) {
+                return resolveMonitorCache(method, path);
+            }
+            if (path.startsWith("/api/monitor/server")) {
+                return resolveMonitorServer(method);
+            }
+            if (path.startsWith("/api/auth/me") || path.startsWith("/api/auth/logout")) {
+                return null;
+            }
+            return DENY_ALL_PERMISSION;
         }
 
         private static String resolveUsers(HttpMethod method, String path) {
@@ -110,6 +156,9 @@ public class JwtAuthWebFilter implements WebFilter {
                 return "system:users:view";
             }
             if (HttpMethod.POST.equals(method)) {
+                if (path.endsWith("/roles")) {
+                    return "system:users:assign-roles";
+                }
                 if (path.endsWith("/reset-password")) {
                     return "system:users:reset-pwd";
                 }
@@ -157,7 +206,9 @@ public class JwtAuthWebFilter implements WebFilter {
 
         private static String resolveMenus(HttpMethod method) {
             if (HttpMethod.GET.equals(method)) {
-                return "system:menus:view";
+                // Menu tree is required for sidebar/navigation rendering of all authenticated users.
+                // Keep write operations protected by explicit menu permissions.
+                return null;
             }
             if (HttpMethod.POST.equals(method)) {
                 return "system:menus:create";
@@ -185,6 +236,59 @@ public class JwtAuthWebFilter implements WebFilter {
                 return "system:departments:delete";
             }
             return null;
+        }
+
+        private static String resolveLogs(HttpMethod method) {
+            if (HttpMethod.GET.equals(method)) {
+                return "system:logs:view";
+            }
+            return DENY_ALL_PERMISSION;
+        }
+
+        private static String resolveMonitorOnline(HttpMethod method, String path) {
+            if (HttpMethod.GET.equals(method) && path.endsWith("/list")) {
+                return "monitor:online:view";
+            }
+            if (HttpMethod.POST.equals(method) && path.endsWith("/force-logout")) {
+                return "monitor:online:force-logout";
+            }
+            return DENY_ALL_PERMISSION;
+        }
+
+        private static String resolveMonitorJobs(HttpMethod method, String path) {
+            if (HttpMethod.GET.equals(method) && path.endsWith("/list")) {
+                return "monitor:jobs:view";
+            }
+            if (HttpMethod.POST.equals(method)) {
+                if (path.endsWith("/execute")) {
+                    return "monitor:jobs:run";
+                }
+                return "monitor:jobs:create";
+            }
+            if (HttpMethod.PUT.equals(method) || HttpMethod.PATCH.equals(method)) {
+                return "monitor:jobs:edit";
+            }
+            if (HttpMethod.DELETE.equals(method)) {
+                return "monitor:jobs:delete";
+            }
+            return DENY_ALL_PERMISSION;
+        }
+
+        private static String resolveMonitorCache(HttpMethod method, String path) {
+            if (HttpMethod.GET.equals(method)) {
+                return "monitor:cache:view";
+            }
+            if (HttpMethod.DELETE.equals(method) || HttpMethod.POST.equals(method)) {
+                return "monitor:cache:clear";
+            }
+            return DENY_ALL_PERMISSION;
+        }
+
+        private static String resolveMonitorServer(HttpMethod method) {
+            if (HttpMethod.GET.equals(method)) {
+                return "monitor:server:view";
+            }
+            return DENY_ALL_PERMISSION;
         }
     }
 }

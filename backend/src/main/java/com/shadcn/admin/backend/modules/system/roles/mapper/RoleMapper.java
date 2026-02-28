@@ -2,7 +2,10 @@ package com.shadcn.admin.backend.modules.system.roles.mapper;
 
 import com.shadcn.admin.backend.modules.system.roles.domain.RoleDO;
 import com.shadcn.admin.backend.modules.system.roles.dto.RoleListQuery;
+import com.shadcn.admin.backend.modules.system.roles.dto.RoleUserListQuery;
+import com.shadcn.admin.backend.modules.system.users.dto.UserLiteDTO;
 import java.util.List;
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,6 +14,7 @@ public interface RoleMapper {
     List<RoleDO> selectPage(RoleListQuery query);
     long count(RoleListQuery query);
     RoleDO selectById(@Param("id") String id);
+    RoleDO selectByCode(@Param("code") String code);
     int insert(RoleDO role);
     int update(RoleDO role);
     int deleteById(@Param("id") String id);
@@ -20,11 +24,14 @@ public interface RoleMapper {
     int deleteRoleMenus(@Param("roleId") String roleId);
     int insertRoleMenu(@Param("roleId") String roleId, @Param("menuId") String menuId);
     List<String> selectMenuIds(@Param("roleId") String roleId);
+    List<Map<String, Object>> selectMenuBindingsByRoleIds(@Param("roleIds") List<String> roleIds);
 
     int deleteRoleDepts(@Param("roleId") String roleId);
     int insertRoleDept(@Param("roleId") String roleId, @Param("deptId") String deptId);
 
     List<String> selectUserIds(@Param("roleId") String roleId);
+    List<UserLiteDTO> selectUsersByRoleId(@Param("roleId") String roleId, @Param("query") RoleUserListQuery query);
+    long countUsersByRoleIdWithKeyword(@Param("roleId") String roleId, @Param("query") RoleUserListQuery query);
     int insertUserRole(@Param("userId") String userId, @Param("roleId") String roleId);
     int deleteUserRole(@Param("userId") String userId, @Param("roleId") String roleId);
     int countUsersByRoleId(@Param("roleId") String roleId);

@@ -2,7 +2,6 @@ package com.shadcn.admin.backend.infra.audit;
 
 import com.shadcn.admin.backend.infra.mybatis.BlockingMyBatisExecutor;
 import com.shadcn.admin.backend.modules.system.logs.mapper.LogMapper;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class AuditService {
 
     public Mono<Void> recordLogin(String username, String ip, String status) {
         return executor.call(() -> {
-                    logMapper.insertLoginLog(UUID.randomUUID().toString(), username, ip, status);
+                    logMapper.insertLoginLog(username, ip, status);
                     return null;
                 })
                 .then()
@@ -34,7 +33,7 @@ public class AuditService {
 
     public Mono<Void> recordOperation(String username, String action, String ip, String status) {
         return executor.call(() -> {
-                    logMapper.insertOperationLog(UUID.randomUUID().toString(), username, action, ip, status);
+                    logMapper.insertOperationLog(username, action, ip, status);
                     return null;
                 })
                 .then()

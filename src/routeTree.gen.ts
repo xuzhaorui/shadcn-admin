@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
@@ -22,29 +21,35 @@ import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
-import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
-import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
+import { Route as AuthenticatedSystemRouteRouteImport } from './routes/_authenticated/system/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as AuthenticatedMonitorRouteRouteImport } from './routes/_authenticated/monitor/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedHomeIndexRouteImport } from './routes/_authenticated/home/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
-import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
-import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
-import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedSystemLogsRouteRouteImport } from './routes/_authenticated/system/logs/route'
+import { Route as AuthenticatedSystemUsersIndexRouteImport } from './routes/_authenticated/system/users/index'
+import { Route as AuthenticatedSystemRolesIndexRouteImport } from './routes/_authenticated/system/roles/index'
+import { Route as AuthenticatedSystemMenusIndexRouteImport } from './routes/_authenticated/system/menus/index'
+import { Route as AuthenticatedSystemDeptsIndexRouteImport } from './routes/_authenticated/system/depts/index'
+import { Route as AuthenticatedMonitorServerIndexRouteImport } from './routes/_authenticated/monitor/server/index'
+import { Route as AuthenticatedMonitorOnlineIndexRouteImport } from './routes/_authenticated/monitor/online/index'
+import { Route as AuthenticatedMonitorJobsIndexRouteImport } from './routes/_authenticated/monitor/jobs/index'
+import { Route as AuthenticatedMonitorCacheIndexRouteImport } from './routes/_authenticated/monitor/cache/index'
+import { Route as AuthenticatedMonitorCacheListIndexRouteImport } from './routes/_authenticated/monitor/cache-list/index'
+import { Route as AuthenticatedComponentsTreeIndexRouteImport } from './routes/_authenticated/components/tree/index'
+import { Route as AuthenticatedSystemLogsOperationIndexRouteImport } from './routes/_authenticated/system/logs/operation/index'
+import { Route as AuthenticatedSystemLogsLoginIndexRouteImport } from './routes/_authenticated/system/logs/login/index'
 
-const ClerkRouteRoute = ClerkRouteRouteImport.update({
-  id: '/clerk',
-  path: '/clerk',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -104,18 +109,22 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClerkAuthenticatedRouteRoute = ClerkAuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => ClerkRouteRoute,
-} as any)
-const ClerkauthRouteRoute = ClerkauthRouteRouteImport.update({
-  id: '/(auth)',
-  getParentRoute: () => ClerkRouteRoute,
-} as any)
+const AuthenticatedSystemRouteRoute =
+  AuthenticatedSystemRouteRouteImport.update({
+    id: '/system',
+    path: '/system',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRouteRoute =
   AuthenticatedSettingsRouteRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMonitorRouteRoute =
+  AuthenticatedMonitorRouteRouteImport.update({
+    id: '/monitor',
+    path: '/monitor',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
@@ -134,6 +143,11 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedHomeIndexRoute = AuthenticatedHomeIndexRouteImport.update({
+  id: '/home/',
+  path: '/home/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
@@ -149,22 +163,6 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const ClerkAuthenticatedUserManagementRoute =
-  ClerkAuthenticatedUserManagementRouteImport.update({
-    id: '/user-management',
-    path: '/user-management',
-    getParentRoute: () => ClerkAuthenticatedRouteRoute,
-  } as any)
-const ClerkauthSignUpRoute = ClerkauthSignUpRouteImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
-  getParentRoute: () => ClerkauthRouteRoute,
-} as any)
-const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
-  getParentRoute: () => ClerkauthRouteRoute,
 } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
@@ -196,10 +194,89 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSystemLogsRouteRoute =
+  AuthenticatedSystemLogsRouteRouteImport.update({
+    id: '/logs',
+    path: '/logs',
+    getParentRoute: () => AuthenticatedSystemRouteRoute,
+  } as any)
+const AuthenticatedSystemUsersIndexRoute =
+  AuthenticatedSystemUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedSystemRouteRoute,
+  } as any)
+const AuthenticatedSystemRolesIndexRoute =
+  AuthenticatedSystemRolesIndexRouteImport.update({
+    id: '/roles/',
+    path: '/roles/',
+    getParentRoute: () => AuthenticatedSystemRouteRoute,
+  } as any)
+const AuthenticatedSystemMenusIndexRoute =
+  AuthenticatedSystemMenusIndexRouteImport.update({
+    id: '/menus/',
+    path: '/menus/',
+    getParentRoute: () => AuthenticatedSystemRouteRoute,
+  } as any)
+const AuthenticatedSystemDeptsIndexRoute =
+  AuthenticatedSystemDeptsIndexRouteImport.update({
+    id: '/depts/',
+    path: '/depts/',
+    getParentRoute: () => AuthenticatedSystemRouteRoute,
+  } as any)
+const AuthenticatedMonitorServerIndexRoute =
+  AuthenticatedMonitorServerIndexRouteImport.update({
+    id: '/server/',
+    path: '/server/',
+    getParentRoute: () => AuthenticatedMonitorRouteRoute,
+  } as any)
+const AuthenticatedMonitorOnlineIndexRoute =
+  AuthenticatedMonitorOnlineIndexRouteImport.update({
+    id: '/online/',
+    path: '/online/',
+    getParentRoute: () => AuthenticatedMonitorRouteRoute,
+  } as any)
+const AuthenticatedMonitorJobsIndexRoute =
+  AuthenticatedMonitorJobsIndexRouteImport.update({
+    id: '/jobs/',
+    path: '/jobs/',
+    getParentRoute: () => AuthenticatedMonitorRouteRoute,
+  } as any)
+const AuthenticatedMonitorCacheIndexRoute =
+  AuthenticatedMonitorCacheIndexRouteImport.update({
+    id: '/cache/',
+    path: '/cache/',
+    getParentRoute: () => AuthenticatedMonitorRouteRoute,
+  } as any)
+const AuthenticatedMonitorCacheListIndexRoute =
+  AuthenticatedMonitorCacheListIndexRouteImport.update({
+    id: '/cache-list/',
+    path: '/cache-list/',
+    getParentRoute: () => AuthenticatedMonitorRouteRoute,
+  } as any)
+const AuthenticatedComponentsTreeIndexRoute =
+  AuthenticatedComponentsTreeIndexRouteImport.update({
+    id: '/components/tree/',
+    path: '/components/tree/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSystemLogsOperationIndexRoute =
+  AuthenticatedSystemLogsOperationIndexRouteImport.update({
+    id: '/operation/',
+    path: '/operation/',
+    getParentRoute: () => AuthenticatedSystemLogsRouteRoute,
+  } as any)
+const AuthenticatedSystemLogsLoginIndexRoute =
+  AuthenticatedSystemLogsLoginIndexRouteImport.update({
+    id: '/login/',
+    path: '/login/',
+    getParentRoute: () => AuthenticatedSystemLogsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/monitor': typeof AuthenticatedMonitorRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/system': typeof AuthenticatedSystemRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -211,23 +288,35 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/system/logs': typeof AuthenticatedSystemLogsRouteRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/clerk/sign-in': typeof ClerkauthSignInRoute
-  '/clerk/sign-up': typeof ClerkauthSignUpRoute
-  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/home': typeof AuthenticatedHomeIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/components/tree': typeof AuthenticatedComponentsTreeIndexRoute
+  '/monitor/cache-list': typeof AuthenticatedMonitorCacheListIndexRoute
+  '/monitor/cache': typeof AuthenticatedMonitorCacheIndexRoute
+  '/monitor/jobs': typeof AuthenticatedMonitorJobsIndexRoute
+  '/monitor/online': typeof AuthenticatedMonitorOnlineIndexRoute
+  '/monitor/server': typeof AuthenticatedMonitorServerIndexRoute
+  '/system/depts': typeof AuthenticatedSystemDeptsIndexRoute
+  '/system/menus': typeof AuthenticatedSystemMenusIndexRoute
+  '/system/roles': typeof AuthenticatedSystemRolesIndexRoute
+  '/system/users': typeof AuthenticatedSystemUsersIndexRoute
+  '/system/logs/login': typeof AuthenticatedSystemLogsLoginIndexRoute
+  '/system/logs/operation': typeof AuthenticatedSystemLogsOperationIndexRoute
 }
 export interface FileRoutesByTo {
-  '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/monitor': typeof AuthenticatedMonitorRouteRouteWithChildren
+  '/system': typeof AuthenticatedSystemRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -239,28 +328,38 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/system/logs': typeof AuthenticatedSystemLogsRouteRouteWithChildren
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/clerk/sign-in': typeof ClerkauthSignInRoute
-  '/clerk/sign-up': typeof ClerkauthSignUpRoute
-  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/home': typeof AuthenticatedHomeIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/components/tree': typeof AuthenticatedComponentsTreeIndexRoute
+  '/monitor/cache-list': typeof AuthenticatedMonitorCacheListIndexRoute
+  '/monitor/cache': typeof AuthenticatedMonitorCacheIndexRoute
+  '/monitor/jobs': typeof AuthenticatedMonitorJobsIndexRoute
+  '/monitor/online': typeof AuthenticatedMonitorOnlineIndexRoute
+  '/monitor/server': typeof AuthenticatedMonitorServerIndexRoute
+  '/system/depts': typeof AuthenticatedSystemDeptsIndexRoute
+  '/system/menus': typeof AuthenticatedSystemMenusIndexRoute
+  '/system/roles': typeof AuthenticatedSystemRolesIndexRoute
+  '/system/users': typeof AuthenticatedSystemUsersIndexRoute
+  '/system/logs/login': typeof AuthenticatedSystemLogsLoginIndexRoute
+  '/system/logs/operation': typeof AuthenticatedSystemLogsOperationIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/clerk': typeof ClerkRouteRouteWithChildren
+  '/_authenticated/monitor': typeof AuthenticatedMonitorRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
-  '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/_authenticated/system': typeof AuthenticatedSystemRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
@@ -272,26 +371,38 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/system/logs': typeof AuthenticatedSystemLogsRouteRouteWithChildren
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
-  '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
-  '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/home/': typeof AuthenticatedHomeIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/components/tree/': typeof AuthenticatedComponentsTreeIndexRoute
+  '/_authenticated/monitor/cache-list/': typeof AuthenticatedMonitorCacheListIndexRoute
+  '/_authenticated/monitor/cache/': typeof AuthenticatedMonitorCacheIndexRoute
+  '/_authenticated/monitor/jobs/': typeof AuthenticatedMonitorJobsIndexRoute
+  '/_authenticated/monitor/online/': typeof AuthenticatedMonitorOnlineIndexRoute
+  '/_authenticated/monitor/server/': typeof AuthenticatedMonitorServerIndexRoute
+  '/_authenticated/system/depts/': typeof AuthenticatedSystemDeptsIndexRoute
+  '/_authenticated/system/menus/': typeof AuthenticatedSystemMenusIndexRoute
+  '/_authenticated/system/roles/': typeof AuthenticatedSystemRolesIndexRoute
+  '/_authenticated/system/users/': typeof AuthenticatedSystemUsersIndexRoute
+  '/_authenticated/system/logs/login/': typeof AuthenticatedSystemLogsLoginIndexRoute
+  '/_authenticated/system/logs/operation/': typeof AuthenticatedSystemLogsOperationIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/clerk'
+    | '/monitor'
     | '/settings'
+    | '/system'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -303,23 +414,35 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/system/logs'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/clerk/sign-in'
-    | '/clerk/sign-up'
-    | '/clerk/user-management'
     | '/apps'
     | '/chats'
     | '/help-center'
+    | '/home'
     | '/settings/'
     | '/tasks'
     | '/users'
+    | '/components/tree'
+    | '/monitor/cache-list'
+    | '/monitor/cache'
+    | '/monitor/jobs'
+    | '/monitor/online'
+    | '/monitor/server'
+    | '/system/depts'
+    | '/system/menus'
+    | '/system/roles'
+    | '/system/users'
+    | '/system/logs/login'
+    | '/system/logs/operation'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/clerk'
+    | '/monitor'
+    | '/system'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -331,27 +454,37 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/system/logs'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/clerk/sign-in'
-    | '/clerk/sign-up'
-    | '/clerk/user-management'
     | '/apps'
     | '/chats'
     | '/help-center'
+    | '/home'
     | '/settings'
     | '/tasks'
     | '/users'
+    | '/components/tree'
+    | '/monitor/cache-list'
+    | '/monitor/cache'
+    | '/monitor/jobs'
+    | '/monitor/online'
+    | '/monitor/server'
+    | '/system/depts'
+    | '/system/menus'
+    | '/system/roles'
+    | '/system/users'
+    | '/system/logs/login'
+    | '/system/logs/operation'
   id:
     | '__root__'
     | '/_authenticated'
-    | '/clerk'
+    | '/_authenticated/monitor'
     | '/_authenticated/settings'
-    | '/clerk/(auth)'
-    | '/clerk/_authenticated'
+    | '/_authenticated/system'
     | '/(auth)/forgot-password'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
@@ -363,25 +496,35 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/system/logs'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
-    | '/clerk/(auth)/sign-in'
-    | '/clerk/(auth)/sign-up'
-    | '/clerk/_authenticated/user-management'
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/home/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/components/tree/'
+    | '/_authenticated/monitor/cache-list/'
+    | '/_authenticated/monitor/cache/'
+    | '/_authenticated/monitor/jobs/'
+    | '/_authenticated/monitor/online/'
+    | '/_authenticated/monitor/server/'
+    | '/_authenticated/system/depts/'
+    | '/_authenticated/system/menus/'
+    | '/_authenticated/system/roles/'
+    | '/_authenticated/system/users/'
+    | '/_authenticated/system/logs/login/'
+    | '/_authenticated/system/logs/operation/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  ClerkRouteRoute: typeof ClerkRouteRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authOtpRoute: typeof authOtpRoute
   authSignInRoute: typeof authSignInRoute
@@ -396,13 +539,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/clerk': {
-      id: '/clerk'
-      path: '/clerk'
-      fullPath: '/clerk'
-      preLoaderRoute: typeof ClerkRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -487,25 +623,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clerk/_authenticated': {
-      id: '/clerk/_authenticated'
-      path: ''
-      fullPath: '/clerk'
-      preLoaderRoute: typeof ClerkAuthenticatedRouteRouteImport
-      parentRoute: typeof ClerkRouteRoute
-    }
-    '/clerk/(auth)': {
-      id: '/clerk/(auth)'
-      path: ''
-      fullPath: '/clerk'
-      preLoaderRoute: typeof ClerkauthRouteRouteImport
-      parentRoute: typeof ClerkRouteRoute
+    '/_authenticated/system': {
+      id: '/_authenticated/system'
+      path: '/system'
+      fullPath: '/system'
+      preLoaderRoute: typeof AuthenticatedSystemRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/monitor': {
+      id: '/_authenticated/monitor'
+      path: '/monitor'
+      fullPath: '/monitor'
+      preLoaderRoute: typeof AuthenticatedMonitorRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/users/': {
@@ -529,6 +665,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/home/': {
+      id: '/_authenticated/home/'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -549,27 +692,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/apps'
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/clerk/_authenticated/user-management': {
-      id: '/clerk/_authenticated/user-management'
-      path: '/user-management'
-      fullPath: '/clerk/user-management'
-      preLoaderRoute: typeof ClerkAuthenticatedUserManagementRouteImport
-      parentRoute: typeof ClerkAuthenticatedRouteRoute
-    }
-    '/clerk/(auth)/sign-up': {
-      id: '/clerk/(auth)/sign-up'
-      path: '/sign-up'
-      fullPath: '/clerk/sign-up'
-      preLoaderRoute: typeof ClerkauthSignUpRouteImport
-      parentRoute: typeof ClerkauthRouteRoute
-    }
-    '/clerk/(auth)/sign-in': {
-      id: '/clerk/(auth)/sign-in'
-      path: '/sign-in'
-      fullPath: '/clerk/sign-in'
-      preLoaderRoute: typeof ClerkauthSignInRouteImport
-      parentRoute: typeof ClerkauthRouteRoute
     }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
@@ -606,8 +728,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/system/logs': {
+      id: '/_authenticated/system/logs'
+      path: '/logs'
+      fullPath: '/system/logs'
+      preLoaderRoute: typeof AuthenticatedSystemLogsRouteRouteImport
+      parentRoute: typeof AuthenticatedSystemRouteRoute
+    }
+    '/_authenticated/system/users/': {
+      id: '/_authenticated/system/users/'
+      path: '/users'
+      fullPath: '/system/users'
+      preLoaderRoute: typeof AuthenticatedSystemUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedSystemRouteRoute
+    }
+    '/_authenticated/system/roles/': {
+      id: '/_authenticated/system/roles/'
+      path: '/roles'
+      fullPath: '/system/roles'
+      preLoaderRoute: typeof AuthenticatedSystemRolesIndexRouteImport
+      parentRoute: typeof AuthenticatedSystemRouteRoute
+    }
+    '/_authenticated/system/menus/': {
+      id: '/_authenticated/system/menus/'
+      path: '/menus'
+      fullPath: '/system/menus'
+      preLoaderRoute: typeof AuthenticatedSystemMenusIndexRouteImport
+      parentRoute: typeof AuthenticatedSystemRouteRoute
+    }
+    '/_authenticated/system/depts/': {
+      id: '/_authenticated/system/depts/'
+      path: '/depts'
+      fullPath: '/system/depts'
+      preLoaderRoute: typeof AuthenticatedSystemDeptsIndexRouteImport
+      parentRoute: typeof AuthenticatedSystemRouteRoute
+    }
+    '/_authenticated/monitor/server/': {
+      id: '/_authenticated/monitor/server/'
+      path: '/server'
+      fullPath: '/monitor/server'
+      preLoaderRoute: typeof AuthenticatedMonitorServerIndexRouteImport
+      parentRoute: typeof AuthenticatedMonitorRouteRoute
+    }
+    '/_authenticated/monitor/online/': {
+      id: '/_authenticated/monitor/online/'
+      path: '/online'
+      fullPath: '/monitor/online'
+      preLoaderRoute: typeof AuthenticatedMonitorOnlineIndexRouteImport
+      parentRoute: typeof AuthenticatedMonitorRouteRoute
+    }
+    '/_authenticated/monitor/jobs/': {
+      id: '/_authenticated/monitor/jobs/'
+      path: '/jobs'
+      fullPath: '/monitor/jobs'
+      preLoaderRoute: typeof AuthenticatedMonitorJobsIndexRouteImport
+      parentRoute: typeof AuthenticatedMonitorRouteRoute
+    }
+    '/_authenticated/monitor/cache/': {
+      id: '/_authenticated/monitor/cache/'
+      path: '/cache'
+      fullPath: '/monitor/cache'
+      preLoaderRoute: typeof AuthenticatedMonitorCacheIndexRouteImport
+      parentRoute: typeof AuthenticatedMonitorRouteRoute
+    }
+    '/_authenticated/monitor/cache-list/': {
+      id: '/_authenticated/monitor/cache-list/'
+      path: '/cache-list'
+      fullPath: '/monitor/cache-list'
+      preLoaderRoute: typeof AuthenticatedMonitorCacheListIndexRouteImport
+      parentRoute: typeof AuthenticatedMonitorRouteRoute
+    }
+    '/_authenticated/components/tree/': {
+      id: '/_authenticated/components/tree/'
+      path: '/components/tree'
+      fullPath: '/components/tree'
+      preLoaderRoute: typeof AuthenticatedComponentsTreeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/system/logs/operation/': {
+      id: '/_authenticated/system/logs/operation/'
+      path: '/operation'
+      fullPath: '/system/logs/operation'
+      preLoaderRoute: typeof AuthenticatedSystemLogsOperationIndexRouteImport
+      parentRoute: typeof AuthenticatedSystemLogsRouteRoute
+    }
+    '/_authenticated/system/logs/login/': {
+      id: '/_authenticated/system/logs/login/'
+      path: '/login'
+      fullPath: '/system/logs/login'
+      preLoaderRoute: typeof AuthenticatedSystemLogsLoginIndexRouteImport
+      parentRoute: typeof AuthenticatedSystemLogsRouteRoute
+    }
   }
 }
+
+interface AuthenticatedMonitorRouteRouteChildren {
+  AuthenticatedMonitorCacheListIndexRoute: typeof AuthenticatedMonitorCacheListIndexRoute
+  AuthenticatedMonitorCacheIndexRoute: typeof AuthenticatedMonitorCacheIndexRoute
+  AuthenticatedMonitorJobsIndexRoute: typeof AuthenticatedMonitorJobsIndexRoute
+  AuthenticatedMonitorOnlineIndexRoute: typeof AuthenticatedMonitorOnlineIndexRoute
+  AuthenticatedMonitorServerIndexRoute: typeof AuthenticatedMonitorServerIndexRoute
+}
+
+const AuthenticatedMonitorRouteRouteChildren: AuthenticatedMonitorRouteRouteChildren =
+  {
+    AuthenticatedMonitorCacheListIndexRoute:
+      AuthenticatedMonitorCacheListIndexRoute,
+    AuthenticatedMonitorCacheIndexRoute: AuthenticatedMonitorCacheIndexRoute,
+    AuthenticatedMonitorJobsIndexRoute: AuthenticatedMonitorJobsIndexRoute,
+    AuthenticatedMonitorOnlineIndexRoute: AuthenticatedMonitorOnlineIndexRoute,
+    AuthenticatedMonitorServerIndexRoute: AuthenticatedMonitorServerIndexRoute,
+  }
+
+const AuthenticatedMonitorRouteRouteWithChildren =
+  AuthenticatedMonitorRouteRoute._addFileChildren(
+    AuthenticatedMonitorRouteRouteChildren,
+  )
 
 interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
@@ -632,77 +868,82 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedSystemLogsRouteRouteChildren {
+  AuthenticatedSystemLogsLoginIndexRoute: typeof AuthenticatedSystemLogsLoginIndexRoute
+  AuthenticatedSystemLogsOperationIndexRoute: typeof AuthenticatedSystemLogsOperationIndexRoute
+}
+
+const AuthenticatedSystemLogsRouteRouteChildren: AuthenticatedSystemLogsRouteRouteChildren =
+  {
+    AuthenticatedSystemLogsLoginIndexRoute:
+      AuthenticatedSystemLogsLoginIndexRoute,
+    AuthenticatedSystemLogsOperationIndexRoute:
+      AuthenticatedSystemLogsOperationIndexRoute,
+  }
+
+const AuthenticatedSystemLogsRouteRouteWithChildren =
+  AuthenticatedSystemLogsRouteRoute._addFileChildren(
+    AuthenticatedSystemLogsRouteRouteChildren,
+  )
+
+interface AuthenticatedSystemRouteRouteChildren {
+  AuthenticatedSystemLogsRouteRoute: typeof AuthenticatedSystemLogsRouteRouteWithChildren
+  AuthenticatedSystemDeptsIndexRoute: typeof AuthenticatedSystemDeptsIndexRoute
+  AuthenticatedSystemMenusIndexRoute: typeof AuthenticatedSystemMenusIndexRoute
+  AuthenticatedSystemRolesIndexRoute: typeof AuthenticatedSystemRolesIndexRoute
+  AuthenticatedSystemUsersIndexRoute: typeof AuthenticatedSystemUsersIndexRoute
+}
+
+const AuthenticatedSystemRouteRouteChildren: AuthenticatedSystemRouteRouteChildren =
+  {
+    AuthenticatedSystemLogsRouteRoute:
+      AuthenticatedSystemLogsRouteRouteWithChildren,
+    AuthenticatedSystemDeptsIndexRoute: AuthenticatedSystemDeptsIndexRoute,
+    AuthenticatedSystemMenusIndexRoute: AuthenticatedSystemMenusIndexRoute,
+    AuthenticatedSystemRolesIndexRoute: AuthenticatedSystemRolesIndexRoute,
+    AuthenticatedSystemUsersIndexRoute: AuthenticatedSystemUsersIndexRoute,
+  }
+
+const AuthenticatedSystemRouteRouteWithChildren =
+  AuthenticatedSystemRouteRoute._addFileChildren(
+    AuthenticatedSystemRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMonitorRouteRoute: typeof AuthenticatedMonitorRouteRouteWithChildren
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedSystemRouteRoute: typeof AuthenticatedSystemRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedHomeIndexRoute: typeof AuthenticatedHomeIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedComponentsTreeIndexRoute: typeof AuthenticatedComponentsTreeIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMonitorRouteRoute: AuthenticatedMonitorRouteRouteWithChildren,
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedSystemRouteRoute: AuthenticatedSystemRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedHomeIndexRoute: AuthenticatedHomeIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedComponentsTreeIndexRoute: AuthenticatedComponentsTreeIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface ClerkauthRouteRouteChildren {
-  ClerkauthSignInRoute: typeof ClerkauthSignInRoute
-  ClerkauthSignUpRoute: typeof ClerkauthSignUpRoute
-}
-
-const ClerkauthRouteRouteChildren: ClerkauthRouteRouteChildren = {
-  ClerkauthSignInRoute: ClerkauthSignInRoute,
-  ClerkauthSignUpRoute: ClerkauthSignUpRoute,
-}
-
-const ClerkauthRouteRouteWithChildren = ClerkauthRouteRoute._addFileChildren(
-  ClerkauthRouteRouteChildren,
-)
-
-interface ClerkAuthenticatedRouteRouteChildren {
-  ClerkAuthenticatedUserManagementRoute: typeof ClerkAuthenticatedUserManagementRoute
-}
-
-const ClerkAuthenticatedRouteRouteChildren: ClerkAuthenticatedRouteRouteChildren =
-  {
-    ClerkAuthenticatedUserManagementRoute:
-      ClerkAuthenticatedUserManagementRoute,
-  }
-
-const ClerkAuthenticatedRouteRouteWithChildren =
-  ClerkAuthenticatedRouteRoute._addFileChildren(
-    ClerkAuthenticatedRouteRouteChildren,
-  )
-
-interface ClerkRouteRouteChildren {
-  ClerkauthRouteRoute: typeof ClerkauthRouteRouteWithChildren
-  ClerkAuthenticatedRouteRoute: typeof ClerkAuthenticatedRouteRouteWithChildren
-}
-
-const ClerkRouteRouteChildren: ClerkRouteRouteChildren = {
-  ClerkauthRouteRoute: ClerkauthRouteRouteWithChildren,
-  ClerkAuthenticatedRouteRoute: ClerkAuthenticatedRouteRouteWithChildren,
-}
-
-const ClerkRouteRouteWithChildren = ClerkRouteRoute._addFileChildren(
-  ClerkRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  ClerkRouteRoute: ClerkRouteRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authOtpRoute: authOtpRoute,
   authSignInRoute: authSignInRoute,

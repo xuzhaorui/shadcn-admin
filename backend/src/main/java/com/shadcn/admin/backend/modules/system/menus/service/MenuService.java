@@ -9,10 +9,11 @@ import com.shadcn.admin.backend.modules.system.menus.dto.MenuUpsertRequest;
 import com.shadcn.admin.backend.modules.system.menus.mapper.MenuMapper;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import reactor.core.publisher.Mono;
@@ -47,7 +48,6 @@ public class MenuService {
         return executor.call(() -> {
             validateMenu(req, null);
             MenuDO menu = new MenuDO();
-            menu.setId(UUID.randomUUID().toString());
             fill(menu, req);
             menu.setVersion(0L);
             menuMapper.insert(menu);
@@ -84,7 +84,8 @@ public class MenuService {
     public Mono<Void> reorder(MenuReorderRequest req) {
         return executor.call(() -> {
             transactionTemplate.executeWithoutResult(status -> {
-                int count = menuMapper.countByParentAndIds(req.getParentId(), req.getOrderedIds());
+                String normalizedParentId = normalizeParentId(req.getParentId());
+                int count = menuMapper.countByParentAndIds(normalizedParentId, req.getOrderedIds());
                 if (count != req.getOrderedIds().size()) {
                     throw new BusinessException(400, "reorder only supports same-level nodes");
                 }
@@ -97,7 +98,7 @@ public class MenuService {
     }
 
     private void fill(MenuDO menu, MenuUpsertRequest req) {
-        menu.setParentId(req.getParentId());
+        menu.setParentId(normalizeParentId(req.getParentId()));
         menu.setType(req.getType());
         menu.setName(req.getName());
         menu.setCode(req.getCode());
@@ -112,10 +113,52 @@ public class MenuService {
         if (menuMapper.existsByCode(req.getCode(), excludeId) > 0) {
             throw new BusinessException(409, "menu code already exists");
         }
+        validateParent(req.getParentId(), excludeId);
         if (("directory".equals(req.getType()) || "menu".equals(req.getType()))
                 && (req.getPath() == null || req.getPath().isBlank())) {
             throw new BusinessException(400, "path is required for directory/menu");
         }
+    }
+
+    private void validateParent(String parentId, String currentId) {
+        String normalizedParentId = normalizeParentId(parentId);
+        if (normalizedParentId == null) {
+            return;
+        }
+        if (currentId != null && currentId.equals(normalizedParentId)) {
+            throw new BusinessException(400, "menu parent cannot be self");
+        }
+
+        MenuDO parent = menuMapper.selectById(normalizedParentId);
+        if (parent == null) {
+            throw new BusinessException(400, "parent menu not found");
+        }
+        if (currentId == null) {
+            return;
+        }
+
+        Set<String> visited = new HashSet<>();
+        String cursor = normalizedParentId;
+        while (cursor != null) {
+            if (!visited.add(cursor)) {
+                throw new BusinessException(400, "menu parent cycle detected");
+            }
+            if (currentId.equals(cursor)) {
+                throw new BusinessException(400, "menu parent cannot be current menu descendant");
+            }
+            MenuDO node = menuMapper.selectById(cursor);
+            if (node == null) {
+                return;
+            }
+            cursor = normalizeParentId(node.getParentId());
+        }
+    }
+
+    private String normalizeParentId(String parentId) {
+        if (parentId == null || parentId.isBlank() || "0".equals(parentId)) {
+            return null;
+        }
+        return parentId;
     }
 
     private List<MenuDTO> buildTree(List<MenuDO> flat) {
@@ -127,14 +170,19 @@ public class MenuService {
         for (List<MenuDO> value : byParent.values()) {
             value.sort(Comparator.comparing(MenuDO::getSort));
         }
-        return buildChildren("0", byParent);
+        return buildChildren("0", byParent, new HashSet<>());
     }
 
-    private List<MenuDTO> buildChildren(String parentId, Map<String, List<MenuDO>> byParent) {
+    private List<MenuDTO> buildChildren(String parentId, Map<String, List<MenuDO>> byParent, Set<String> path) {
         List<MenuDO> children = byParent.getOrDefault(parentId, List.of());
         List<MenuDTO> result = new ArrayList<>();
         for (MenuDO child : children) {
-            result.add(toDto(child, buildChildren(child.getId(), byParent)));
+            if (path.contains(child.getId())) {
+                throw new BusinessException(500, "menu tree contains cycle");
+            }
+            Set<String> nextPath = new HashSet<>(path);
+            nextPath.add(child.getId());
+            result.add(toDto(child, buildChildren(child.getId(), byParent, nextPath)));
         }
         return result;
     }

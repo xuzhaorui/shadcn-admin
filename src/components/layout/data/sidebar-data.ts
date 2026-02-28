@@ -1,28 +1,36 @@
 import {
-  Construction,
-  LayoutDashboard,
-  Monitor,
-  Bug,
-  ListTodo,
-  FileX,
-  HelpCircle,
-  Lock,
+  Activity,
+  AudioWaveform,
   Bell,
+  Bug,
+  Building2,
+  Clock,
+  Command,
+  Construction,
+  Database,
+  FileText,
+  FileX,
+  GalleryVerticalEnd,
+  HelpCircle,
+  LayoutDashboard,
+  List,
+  ListTodo,
+  Lock,
+  Menu,
+  MessagesSquare,
+  Monitor,
   Package,
   Palette,
+  Server,
   ServerOff,
   Settings,
-  Wrench,
+  Shield,
+  ShieldCheck,
   UserCog,
   UserX,
   Users,
-  MessagesSquare,
-  ShieldCheck,
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
+  Wrench,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -77,24 +85,6 @@ export const sidebarData: SidebarData = {
           title: 'Users',
           url: '/users',
           icon: Users,
-        },
-        {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
-            },
-            {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
-            },
-            {
-              title: 'User Management',
-              url: '/clerk/user-management',
-            },
-          ],
         },
       ],
     },
@@ -157,6 +147,80 @@ export const sidebarData: SidebarData = {
               icon: Construction,
             },
           ],
+        },
+      ],
+    },
+    {
+      title: 'System',
+      items: [
+        {
+          title: 'Users',
+          url: '/system/users',
+          icon: Users,
+        },
+        {
+          title: 'Roles',
+          url: '/system/roles',
+          icon: Shield,
+        },
+        {
+          title: 'Menus',
+          url: '/system/menus',
+          icon: Menu,
+        },
+        {
+          title: 'Departments',
+          url: '/system/depts',
+          icon: Building2,
+        },
+        {
+          title: 'Logs',
+          icon: FileText,
+          items: [
+            {
+              title: 'Operation Logs',
+              url: '/system/logs/operation',
+            },
+            {
+              title: 'Login Logs',
+              url: '/system/logs/login',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Monitor',
+      items: [
+        {
+          title: 'Online Users',
+          url: '/monitor/online',
+          icon: Activity,
+        },
+        {
+          title: 'Scheduled Jobs',
+          url: '/monitor/jobs',
+          icon: Clock,
+        },
+        {
+          title: 'Server Status',
+          url: '/monitor/server',
+          icon: Server,
+        },
+        {
+          title: 'Cache Monitor',
+          url: '/monitor/cache',
+          icon: Database,
+        },
+      ],
+    },
+    {
+      title: 'Components',
+      items: [
+        {
+          title: 'Tree Table',
+          url: '/components/tree',
+          icon: List,
         },
       ],
     },

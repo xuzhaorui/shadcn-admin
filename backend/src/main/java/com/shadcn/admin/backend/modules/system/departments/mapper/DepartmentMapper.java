@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 public interface DepartmentMapper {
     List<DepartmentDO> selectAll();
     DepartmentDO selectById(@Param("id") String id);
+    DepartmentDO selectByCode(@Param("code") String code);
     int insert(DepartmentDO department);
     int update(DepartmentDO department);
     int deleteById(@Param("id") String id);
@@ -16,6 +17,7 @@ public interface DepartmentMapper {
     int existsByCode(@Param("code") String code, @Param("excludeId") String excludeId);
     int countChildren(@Param("id") String id);
     int countUsers(@Param("id") String id);
+    int countRoleBindings(@Param("id") String id);
     int updateSort(@Param("id") String id, @Param("sort") int sort);
     int countByParentAndIds(@Param("parentId") String parentId, @Param("orderedIds") List<String> orderedIds);
 }

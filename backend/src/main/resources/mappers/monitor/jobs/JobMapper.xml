@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shadcn.admin.backend.modules.monitor.jobs.mapper.JobMapper">
+
+  <resultMap id="JobMap" type="com.shadcn.admin.backend.modules.monitor.jobs.domain.JobDO">
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="job_group" property="group"/>
+    <result column="invoke_target" property="invokeTarget"/>
+    <result column="cron_expression" property="cronExpression"/>
+    <result column="misfire_policy" property="misfirePolicy"/>
+    <result column="concurrent_flag" property="concurrent"/>
+    <result column="status" property="status"/>
+    <result column="remark" property="remark"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+    <result column="last_execute_time" property="lastExecuteTime"/>
+    <result column="next_execute_time" property="nextExecuteTime"/>
+  </resultMap>
+
+  <sql id="BaseColumns">
+    id, name, job_group, invoke_target, cron_expression, misfire_policy, concurrent_flag, status, remark,
+    created_at, updated_at, last_execute_time, next_execute_time
+  </sql>
+
+  <select id="selectPage" resultMap="JobMap">
+    select <include refid="BaseColumns"/>
+    from sys_job
+    <where>
+      <if test="keyword != null and keyword != ''">
+        and (
+          name like concat('%', #{keyword}, '%')
+          or job_group like concat('%', #{keyword}, '%')
+          or invoke_target like concat('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="status != null and status != ''">
+        and status = #{status}
+      </if>
+    </where>
+    order by id asc
+    limit #{pageSize} offset #{offset}
+  </select>
+
+  <select id="count" resultType="long">
+    select count(1)
+    from sys_job
+    <where>
+      <if test="keyword != null and keyword != ''">
+        and (
+          name like concat('%', #{keyword}, '%')
+          or job_group like concat('%', #{keyword}, '%')
+          or invoke_target like concat('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="status != null and status != ''">
+        and status = #{status}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectAll" resultMap="JobMap">
+    select <include refid="BaseColumns"/>
+    from sys_job
+    order by id asc
+  </select>
+
+  <select id="selectById" resultMap="JobMap">
+    select <include refid="BaseColumns"/>
+    from sys_job
+    where id = #{id}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    insert into sys_job
+    (name, job_group, invoke_target, cron_expression, misfire_policy, concurrent_flag, status, remark)
+    values
+    (#{name}, #{group}, #{invokeTarget}, #{cronExpression}, #{misfirePolicy}, #{concurrent}, #{status}, #{remark})
+  </insert>
+
+  <update id="update">
+    update sys_job
+    set name = #{name},
+        job_group = #{group},
+        invoke_target = #{invokeTarget},
+        cron_expression = #{cronExpression},
+        misfire_policy = #{misfirePolicy},
+        concurrent_flag = #{concurrent},
+        status = #{status},
+        remark = #{remark},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    delete from sys_job where id = #{id}
+  </delete>
+
+  <update id="updateStatus">
+    update sys_job
+    set status = #{status},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="updateExecutionTime">
+    update sys_job
+    set last_execute_time = #{lastExecuteTime},
+        next_execute_time = #{nextExecuteTime},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="updateNextExecuteTime">
+    update sys_job
+    set next_execute_time = #{nextExecuteTime},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+</mapper>
