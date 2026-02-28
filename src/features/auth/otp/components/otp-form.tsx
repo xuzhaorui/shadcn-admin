@@ -24,8 +24,8 @@ import {
 const formSchema = z.object({
   otp: z
     .string()
-    .min(6, 'Please enter the 6-digit code.')
-    .max(6, 'Please enter the 6-digit code.'),
+    .min(6, '请输入6位验证码')
+    .max(6, '请输入6位验证码'),
 })
 
 type OtpFormProps = React.HTMLAttributes<HTMLFormElement>
@@ -39,7 +39,6 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
     defaultValues: { otp: '' },
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const otp = form.watch('otp')
 
   function onSubmit(data: z.infer<typeof formSchema>) {
@@ -64,7 +63,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
           name='otp'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='sr-only'>One-Time Password</FormLabel>
+              <FormLabel className='sr-only'>一次性密码</FormLabel>
               <FormControl>
                 <InputOTP
                   maxLength={6}
@@ -92,7 +91,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
           )}
         />
         <Button className='mt-2' disabled={otp.length < 6 || isLoading}>
-          Verify
+          验证
         </Button>
       </form>
     </Form>

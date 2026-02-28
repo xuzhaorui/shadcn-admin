@@ -1,33 +1,27 @@
-import { faker } from '@faker-js/faker'
+import { type User } from './schema'
 
-// Set a fixed seed for consistent data generation
-faker.seed(67890)
+const rolePool = ['superadmin', 'admin', 'manager', 'cashier']
+const deptPool = ['1', '1-1', '1-1-1', '1-1-2', '1-1-3', '1-2', '1-3', '1-4']
+const firstNames = ['明', '华', '杰', '娜', '伟', '洋', '晨', '婷'] as const
+const lastNames = ['张', '王', '李', '赵', '刘', '陈', '杨', '周'] as const
 
-export const users = Array.from({ length: 500 }, () => {
-  const firstName = faker.person.firstName()
-  const lastName = faker.person.lastName()
+export const users: User[] = Array.from({ length: 200 }, (_, index) => {
+  const firstName = firstNames[index % firstNames.length]
+  const lastName = lastNames[index % lastNames.length]
+  const realName = `${lastName}${firstName}`
+  const username = `${lastName.toLowerCase()}${firstName.toLowerCase()}${1000 + index}`
+  const roleHead = rolePool[index % rolePool.length]
+  const roleTail = rolePool[(index + 1) % rolePool.length]
+  const roleIds = index % 3 === 0 ? [roleHead, roleTail] : [roleHead]
+
   return {
-    id: faker.string.uuid(),
-    firstName,
-    lastName,
-    username: faker.internet
-      .username({ firstName, lastName })
-      .toLocaleLowerCase(),
-    email: faker.internet.email({ firstName }).toLocaleLowerCase(),
-    phoneNumber: faker.phone.number({ style: 'international' }),
-    status: faker.helpers.arrayElement([
-      'active',
-      'inactive',
-      'invited',
-      'suspended',
-    ]),
-    role: faker.helpers.arrayElement([
-      'superadmin',
-      'admin',
-      'cashier',
-      'manager',
-    ]),
-    createdAt: faker.date.past(),
-    updatedAt: faker.date.recent(),
+    id: `user-${index + 1}`,
+    username,
+    realName,
+    email: `${username}@example.com`,
+    phone: index % 5 === 0 ? undefined : `1${String(3000000000 + index).padStart(10, '0')}`,
+    departmentId: deptPool[index % deptPool.length],
+    roleIds,
+    status: index % 6 === 0 ? 'inactive' : 'active',
   }
 })
