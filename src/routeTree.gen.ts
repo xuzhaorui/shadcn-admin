@@ -21,6 +21,7 @@ import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as AuthenticatedWmsRouteRouteImport } from './routes/_authenticated/wms/route'
 import { Route as AuthenticatedSystemRouteRouteImport } from './routes/_authenticated/system/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedMonitorRouteRouteImport } from './routes/_authenticated/monitor/route'
@@ -37,6 +38,7 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedSystemLogsRouteRouteImport } from './routes/_authenticated/system/logs/route'
+import { Route as AuthenticatedWmsWarehousesIndexRouteImport } from './routes/_authenticated/wms/warehouses/index'
 import { Route as AuthenticatedSystemUsersIndexRouteImport } from './routes/_authenticated/system/users/index'
 import { Route as AuthenticatedSystemRolesIndexRouteImport } from './routes/_authenticated/system/roles/index'
 import { Route as AuthenticatedSystemMenusIndexRouteImport } from './routes/_authenticated/system/menus/index'
@@ -108,6 +110,11 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   id: '/(auth)/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWmsRouteRoute = AuthenticatedWmsRouteRouteImport.update({
+  id: '/wms',
+  path: '/wms',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSystemRouteRoute =
   AuthenticatedSystemRouteRouteImport.update({
@@ -200,6 +207,12 @@ const AuthenticatedSystemLogsRouteRoute =
     path: '/logs',
     getParentRoute: () => AuthenticatedSystemRouteRoute,
   } as any)
+const AuthenticatedWmsWarehousesIndexRoute =
+  AuthenticatedWmsWarehousesIndexRouteImport.update({
+    id: '/warehouses/',
+    path: '/warehouses/',
+    getParentRoute: () => AuthenticatedWmsRouteRoute,
+  } as any)
 const AuthenticatedSystemUsersIndexRoute =
   AuthenticatedSystemUsersIndexRouteImport.update({
     id: '/users/',
@@ -277,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/monitor': typeof AuthenticatedMonitorRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/system': typeof AuthenticatedSystemRouteRouteWithChildren
+  '/wms': typeof AuthenticatedWmsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -311,12 +325,14 @@ export interface FileRoutesByFullPath {
   '/system/menus': typeof AuthenticatedSystemMenusIndexRoute
   '/system/roles': typeof AuthenticatedSystemRolesIndexRoute
   '/system/users': typeof AuthenticatedSystemUsersIndexRoute
+  '/wms/warehouses': typeof AuthenticatedWmsWarehousesIndexRoute
   '/system/logs/login': typeof AuthenticatedSystemLogsLoginIndexRoute
   '/system/logs/operation': typeof AuthenticatedSystemLogsOperationIndexRoute
 }
 export interface FileRoutesByTo {
   '/monitor': typeof AuthenticatedMonitorRouteRouteWithChildren
   '/system': typeof AuthenticatedSystemRouteRouteWithChildren
+  '/wms': typeof AuthenticatedWmsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -351,6 +367,7 @@ export interface FileRoutesByTo {
   '/system/menus': typeof AuthenticatedSystemMenusIndexRoute
   '/system/roles': typeof AuthenticatedSystemRolesIndexRoute
   '/system/users': typeof AuthenticatedSystemUsersIndexRoute
+  '/wms/warehouses': typeof AuthenticatedWmsWarehousesIndexRoute
   '/system/logs/login': typeof AuthenticatedSystemLogsLoginIndexRoute
   '/system/logs/operation': typeof AuthenticatedSystemLogsOperationIndexRoute
 }
@@ -360,6 +377,7 @@ export interface FileRoutesById {
   '/_authenticated/monitor': typeof AuthenticatedMonitorRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/_authenticated/system': typeof AuthenticatedSystemRouteRouteWithChildren
+  '/_authenticated/wms': typeof AuthenticatedWmsRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
@@ -394,6 +412,7 @@ export interface FileRoutesById {
   '/_authenticated/system/menus/': typeof AuthenticatedSystemMenusIndexRoute
   '/_authenticated/system/roles/': typeof AuthenticatedSystemRolesIndexRoute
   '/_authenticated/system/users/': typeof AuthenticatedSystemUsersIndexRoute
+  '/_authenticated/wms/warehouses/': typeof AuthenticatedWmsWarehousesIndexRoute
   '/_authenticated/system/logs/login/': typeof AuthenticatedSystemLogsLoginIndexRoute
   '/_authenticated/system/logs/operation/': typeof AuthenticatedSystemLogsOperationIndexRoute
 }
@@ -403,6 +422,7 @@ export interface FileRouteTypes {
     | '/monitor'
     | '/settings'
     | '/system'
+    | '/wms'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -437,12 +457,14 @@ export interface FileRouteTypes {
     | '/system/menus'
     | '/system/roles'
     | '/system/users'
+    | '/wms/warehouses'
     | '/system/logs/login'
     | '/system/logs/operation'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/monitor'
     | '/system'
+    | '/wms'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -477,6 +499,7 @@ export interface FileRouteTypes {
     | '/system/menus'
     | '/system/roles'
     | '/system/users'
+    | '/wms/warehouses'
     | '/system/logs/login'
     | '/system/logs/operation'
   id:
@@ -485,6 +508,7 @@ export interface FileRouteTypes {
     | '/_authenticated/monitor'
     | '/_authenticated/settings'
     | '/_authenticated/system'
+    | '/_authenticated/wms'
     | '/(auth)/forgot-password'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
@@ -519,6 +543,7 @@ export interface FileRouteTypes {
     | '/_authenticated/system/menus/'
     | '/_authenticated/system/roles/'
     | '/_authenticated/system/users/'
+    | '/_authenticated/wms/warehouses/'
     | '/_authenticated/system/logs/login/'
     | '/_authenticated/system/logs/operation/'
   fileRoutesById: FileRoutesById
@@ -622,6 +647,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/forgot-password'
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/wms': {
+      id: '/_authenticated/wms'
+      path: '/wms'
+      fullPath: '/wms'
+      preLoaderRoute: typeof AuthenticatedWmsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/system': {
       id: '/_authenticated/system'
@@ -734,6 +766,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/system/logs'
       preLoaderRoute: typeof AuthenticatedSystemLogsRouteRouteImport
       parentRoute: typeof AuthenticatedSystemRouteRoute
+    }
+    '/_authenticated/wms/warehouses/': {
+      id: '/_authenticated/wms/warehouses/'
+      path: '/warehouses'
+      fullPath: '/wms/warehouses'
+      preLoaderRoute: typeof AuthenticatedWmsWarehousesIndexRouteImport
+      parentRoute: typeof AuthenticatedWmsRouteRoute
     }
     '/_authenticated/system/users/': {
       id: '/_authenticated/system/users/'
@@ -909,10 +948,24 @@ const AuthenticatedSystemRouteRouteWithChildren =
     AuthenticatedSystemRouteRouteChildren,
   )
 
+interface AuthenticatedWmsRouteRouteChildren {
+  AuthenticatedWmsWarehousesIndexRoute: typeof AuthenticatedWmsWarehousesIndexRoute
+}
+
+const AuthenticatedWmsRouteRouteChildren: AuthenticatedWmsRouteRouteChildren = {
+  AuthenticatedWmsWarehousesIndexRoute: AuthenticatedWmsWarehousesIndexRoute,
+}
+
+const AuthenticatedWmsRouteRouteWithChildren =
+  AuthenticatedWmsRouteRoute._addFileChildren(
+    AuthenticatedWmsRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMonitorRouteRoute: typeof AuthenticatedMonitorRouteRouteWithChildren
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedSystemRouteRoute: typeof AuthenticatedSystemRouteRouteWithChildren
+  AuthenticatedWmsRouteRoute: typeof AuthenticatedWmsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -928,6 +981,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMonitorRouteRoute: AuthenticatedMonitorRouteRouteWithChildren,
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedSystemRouteRoute: AuthenticatedSystemRouteRouteWithChildren,
+  AuthenticatedWmsRouteRoute: AuthenticatedWmsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

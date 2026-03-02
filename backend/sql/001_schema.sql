@@ -134,3 +134,14 @@ create table if not exists sys_job (
   key idx_sys_job_status (status)
 );
 
+create table if not exists wms_warehouse (
+  id bigint primary key auto_increment,
+  name varchar(64) not null,
+  description varchar(255) null,
+  status varchar(16) not null default 'enabled',
+  created_at datetime not null default current_timestamp,
+  updated_at datetime not null default current_timestamp on update current_timestamp,
+  unique key uk_wms_warehouse_name (name),
+  key idx_wms_warehouse_status (status)
+);
+

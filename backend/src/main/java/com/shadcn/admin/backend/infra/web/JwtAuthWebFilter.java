@@ -142,6 +142,9 @@ public class JwtAuthWebFilter implements WebFilter {
             if (path.startsWith("/api/monitor/server")) {
                 return resolveMonitorServer(method);
             }
+            if (path.startsWith("/api/wms/warehouses")) {
+                return resolveWmsWarehouses(method);
+            }
             if (path.startsWith("/api/auth/me") || path.startsWith("/api/auth/logout")) {
                 return null;
             }
@@ -287,6 +290,22 @@ public class JwtAuthWebFilter implements WebFilter {
         private static String resolveMonitorServer(HttpMethod method) {
             if (HttpMethod.GET.equals(method)) {
                 return "monitor:server:view";
+            }
+            return DENY_ALL_PERMISSION;
+        }
+
+        private static String resolveWmsWarehouses(HttpMethod method) {
+            if (HttpMethod.GET.equals(method)) {
+                return "wms:warehouses:view";
+            }
+            if (HttpMethod.POST.equals(method)) {
+                return "wms:warehouses:create";
+            }
+            if (HttpMethod.PUT.equals(method) || HttpMethod.PATCH.equals(method)) {
+                return "wms:warehouses:edit";
+            }
+            if (HttpMethod.DELETE.equals(method)) {
+                return "wms:warehouses:delete";
             }
             return DENY_ALL_PERMISSION;
         }

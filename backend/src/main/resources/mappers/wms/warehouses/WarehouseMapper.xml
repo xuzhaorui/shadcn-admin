@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shadcn.admin.backend.modules.wms.warehouses.mapper.WarehouseMapper">
+
+  <resultMap id="WarehouseMap" type="com.shadcn.admin.backend.modules.wms.warehouses.domain.WarehouseDO">
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="description" property="description"/>
+    <result column="status" property="status"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <sql id="BaseColumns">
+    id, name, description, status, created_at, updated_at
+  </sql>
+
+  <select id="selectPage" resultMap="WarehouseMap">
+    select <include refid="BaseColumns"/>
+    from wms_warehouse
+    <where>
+      <if test="keyword != null and keyword != ''">
+        and (
+          name like concat('%', #{keyword}, '%')
+          or description like concat('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="status != null and status != ''">
+        and status = #{status}
+      </if>
+    </where>
+    order by id desc
+    limit #{pageSize} offset #{offset}
+  </select>
+
+  <select id="count" resultType="long">
+    select count(1)
+    from wms_warehouse
+    <where>
+      <if test="keyword != null and keyword != ''">
+        and (
+          name like concat('%', #{keyword}, '%')
+          or description like concat('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="status != null and status != ''">
+        and status = #{status}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectById" resultMap="WarehouseMap">
+    select <include refid="BaseColumns"/>
+    from wms_warehouse
+    where id = #{id}
+  </select>
+
+  <select id="existsByName" resultType="int">
+    select count(1)
+    from wms_warehouse
+    where name = #{name}
+    <if test="excludeId != null and excludeId != ''">
+      and id != #{excludeId}
+    </if>
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    insert into wms_warehouse (name, description, status)
+    values (#{name}, #{description}, #{status})
+  </insert>
+
+  <update id="update">
+    update wms_warehouse
+    set name = #{name},
+        description = #{description},
+        status = #{status},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+</mapper>

@@ -48,6 +48,21 @@ class JwtAuthWebFilterPermissionResolverTest {
         assertEquals(
                 "monitor:server:view",
                 JwtAuthWebFilter.PermissionResolver.resolve(HttpMethod.GET, "/api/monitor/server/metrics"));
+        assertEquals(
+                "wms:warehouses:view",
+                JwtAuthWebFilter.PermissionResolver.resolve(HttpMethod.GET, "/api/wms/warehouses/list"));
+        assertEquals(
+                "wms:warehouses:create",
+                JwtAuthWebFilter.PermissionResolver.resolve(HttpMethod.POST, "/api/wms/warehouses"));
+        assertEquals(
+                "wms:warehouses:edit",
+                JwtAuthWebFilter.PermissionResolver.resolve(HttpMethod.PUT, "/api/wms/warehouses/1"));
+        assertEquals(
+                "wms:warehouses:edit",
+                JwtAuthWebFilter.PermissionResolver.resolve(HttpMethod.PATCH, "/api/wms/warehouses/1"));
+        assertEquals(
+                "wms:warehouses:delete",
+                JwtAuthWebFilter.PermissionResolver.resolve(HttpMethod.DELETE, "/api/wms/warehouses/1"));
     }
 
     @Test
